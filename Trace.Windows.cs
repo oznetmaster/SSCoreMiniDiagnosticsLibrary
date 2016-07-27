@@ -18,7 +18,24 @@ namespace System.Diagnostics
 	{
    public static partial class Trace
 		{
-		internal static readonly IDebugLogger s_logger = new WindowsDebugLogger ();
+#if SSHARP
+	   public enum OutputMode
+		   {
+		   Debugger,
+			Console,
+			ConsoleIfNotDebugging,
+			None
+		   }
+
+	   public static OutputMode Mode { get; set; }
+
+	   static Trace ()
+		   {
+			Mode = OutputMode.Debugger;
+		   }
+#endif
+
+	   internal static readonly IDebugLogger s_logger = new WindowsDebugLogger ();
 
 		internal sealed class WindowsDebugLogger : IDebugLogger
 			{
@@ -47,10 +64,14 @@ namespace System.Diagnostics
 
 			public void WriteCore (string message)
 				{
+#if SSHARP
+				if (Mode == OutputMode.None)
+					return;
+#endif
 				// really huge messages mess up both VS and dbmon, so we chop it up into 
 				// reasonable chunks if it's too big. This is the number of characters 
 				// that OutputDebugstring chunks at.
-				const int WriteChunkLength = 4091;
+				const int WriteChunkLength = 512;
 
 				// We don't want output from multiple threads to be interleaved.
 				lock (s_ForLock)
@@ -85,7 +106,10 @@ namespace System.Diagnostics
 #endif
 					{
 #if SSHARP
-					Debugger.Write (message ?? string.Empty);
+					if (Mode == OutputMode.Console || (Mode == OutputMode.ConsoleIfNotDebugging && !Debugger.IsAttached))
+						CrestronConsole.Print (message ?? string.Empty);
+					else 
+						Debugger.Write (message ?? string.Empty);
 #else
                Interop.mincore.OutputDebugString(message ?? string.Empty);
 #endif
