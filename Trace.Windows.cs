@@ -19,14 +19,6 @@ namespace System.Diagnostics
    public static partial class Trace
 		{
 #if SSHARP
-	   public enum OutputMode
-		   {
-		   Debugger,
-			Console,
-			ConsoleIfNotDebugging,
-			None
-		   }
-
 	   public static OutputMode Mode { get; set; }
 
 	   static Trace ()

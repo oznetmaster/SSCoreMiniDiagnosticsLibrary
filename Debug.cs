@@ -21,6 +21,19 @@ namespace System.Diagnostics
 	/// </summary>
 	public static class Debug
 		{
+#if SSHARP
+		public static OutputMode Mode
+			{
+			get { return Trace.Mode; }
+			set { Trace.Mode = value; }
+			}
+
+		static Debug ()
+		   {
+			Mode = OutputMode.Debugger;
+		   }
+#endif
+
 		[System.Diagnostics.Conditional ("DEBUG")]
 		public static void Assert (bool condition)
 			{
