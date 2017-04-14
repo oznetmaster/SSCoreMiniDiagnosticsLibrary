@@ -64,6 +64,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OutputMode.cs" />
+    <Compile Include="Switch\BooleanSwitch.cs" />
+    <Compile Include="Switch\SourceLevels.cs" />
+    <Compile Include="Switch\SourceSwitch.cs" />
+    <Compile Include="Switch\Switch.cs" />
+    <Compile Include="Switch\SwitchLevelAttribute.cs" />
+    <Compile Include="Switch\TraceEventType.cs" />
+    <Compile Include="Switch\TraceLevel.cs" />
+    <Compile Include="Switch\TraceSwitch.cs" />
     <Compile Include="Trace.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Trace.Windows.cs" />
