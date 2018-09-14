@@ -236,5 +236,17 @@ namespace System.Diagnostics
 				WriteLine (value, category);
 				}
 			}
+
+		[System.Diagnostics.Conditional ("TRACE")]
+		public static void Print (string message)
+			{
+			WriteLine (message);
+			}
+
+		[System.Diagnostics.Conditional ("TRACE")]
+		public static void Print (string format, params object[] args)
+			{
+			WriteLine (format, args);
+			}
 		}
 	}

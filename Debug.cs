@@ -28,9 +28,15 @@ namespace System.Diagnostics
 			set { Trace.Mode = value; }
 			}
 
+		public static Trace.FormatMessageDelegate FormatMessage
+			{
+			get { return Trace.FormatMessage; }
+			set { Trace.FormatMessage = value; }
+			}
+
 		static Debug ()
 		   {
-			Mode = OutputMode.Debugger;
+			//Mode = OutputMode.Debugger;
 		   }
 #endif
 
@@ -248,6 +254,18 @@ namespace System.Diagnostics
 				{
 				WriteLine (value, category);
 				}
+			}
+
+		[System.Diagnostics.Conditional ("DEBUG")]
+		public static void Print (string message)
+			{
+			WriteLine (message);
+			}
+
+		[System.Diagnostics.Conditional ("DEBUG")]
+		public static void Print (string format, params object[] args)
+			{
+			WriteLine (format, args);
 			}
 
 		}

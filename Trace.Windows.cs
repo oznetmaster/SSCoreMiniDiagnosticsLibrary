@@ -25,6 +25,15 @@ namespace System.Diagnostics
 		   {
 			Mode = OutputMode.Debugger;
 		   }
+
+	   public delegate string FormatMessageDelegate (string message);
+
+	   private static FormatMessageDelegate formatMessage;
+	   public static FormatMessageDelegate FormatMessage
+		   {
+		   get { return formatMessage ?? (s => s); }
+		   set { formatMessage = value; }
+		   }
 #endif
 
 	   internal static readonly IDebugLogger s_logger = new WindowsDebugLogger ();
@@ -98,10 +107,12 @@ namespace System.Diagnostics
 #endif
 					{
 #if SSHARP
+					var msg = FormatMessage (message ?? string.Empty);
+
 					if (Mode == OutputMode.Console || (Mode == OutputMode.ConsoleIfNotDebugging && !Debugger.IsAttached))
-						CrestronConsole.Print (message ?? string.Empty);
+						CrestronConsole.Print (msg);
 					else 
-						Debugger.Write (message ?? string.Empty);
+						Debugger.Write (msg);
 #else
                Interop.mincore.OutputDebugString(message ?? string.Empty);
 #endif
