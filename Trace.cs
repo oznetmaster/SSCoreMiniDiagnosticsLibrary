@@ -166,6 +166,12 @@ namespace System.Diagnostics
 			}
 
 		[System.Diagnostics.Conditional ("TRACE")]
+		public static void Write (string format, params object[] args)
+			{
+			WriteLine (string.Format (null, format, args));
+			}
+
+		[System.Diagnostics.Conditional ("TRACE")]
 		public static void WriteIf (bool condition, string message)
 			{
 			if (condition)
@@ -202,6 +208,13 @@ namespace System.Diagnostics
 			}
 
 		[System.Diagnostics.Conditional ("TRACE")]
+		public static void WriteIf (bool condition, string format, params object[] args)
+			{
+			if (condition)
+				WriteLine (string.Format (null, format, args));
+			}
+
+		[System.Diagnostics.Conditional ("TRACE")]
 		public static void WriteLineIf (bool condition, object value)
 			{
 			if (condition)
@@ -235,6 +248,13 @@ namespace System.Diagnostics
 				{
 				WriteLine (value, category);
 				}
+			}
+
+		[System.Diagnostics.Conditional ("TRACE")]
+		public static void WriteLineIf (bool condition, string format, params object[] args)
+			{
+			if (condition)
+				WriteLine (string.Format (null, format, args));
 			}
 
 		[System.Diagnostics.Conditional ("TRACE")]

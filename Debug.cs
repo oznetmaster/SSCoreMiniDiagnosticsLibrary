@@ -185,6 +185,12 @@ namespace System.Diagnostics
 			}
 
 		[System.Diagnostics.Conditional ("DEBUG")]
+		public static void Write (string format, params object[] args)
+			{
+			WriteLine (string.Format (null, format, args));
+			}
+
+		[System.Diagnostics.Conditional ("DEBUG")]
 		public static void WriteIf (bool condition, string message)
 			{
 			if (condition)
@@ -215,45 +221,49 @@ namespace System.Diagnostics
 		public static void WriteIf (bool condition, object value, string category)
 			{
 			if (condition)
-				{
 				Write (value, category);
-				}
+			}
+
+		[System.Diagnostics.Conditional ("DEBUG")]
+		public static void WriteIf (bool condition, string format, params object[] args)
+			{
+			if (condition)
+				WriteLine (string.Format (null, format, args));
 			}
 
 		[System.Diagnostics.Conditional ("DEBUG")]
 		public static void WriteLineIf (bool condition, object value)
 			{
 			if (condition)
-				{
 				WriteLine (value);
-				}
 			}
 
 		[System.Diagnostics.Conditional ("DEBUG")]
 		public static void WriteLineIf (bool condition, object value, string category)
 			{
 			if (condition)
-				{
 				WriteLine (value, category);
-				}
 			}
 
 		[System.Diagnostics.Conditional ("DEBUG")]
 		public static void WriteLineIf (bool condition, string value)
 			{
 			if (condition)
-				{
 				WriteLine (value);
-				}
 			}
 
 		[System.Diagnostics.Conditional ("DEBUG")]
 		public static void WriteLineIf (bool condition, string value, string category)
 			{
 			if (condition)
-				{
 				WriteLine (value, category);
-				}
+			}
+
+		[System.Diagnostics.Conditional ("DEBUG")]
+		public static void WriteLineIf (bool condition, string format, params object[] args)
+			{
+			if (condition)
+				WriteLine (string.Format (null, format, args));
 			}
 
 		[System.Diagnostics.Conditional ("DEBUG")]
