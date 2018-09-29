@@ -4,45 +4,87 @@
 #if SSHARP
 using System;
 using Environment = Crestron.SimplSharp.CrestronEnvironment;
+using Crestron.SimplSharp.Reflection;
 #else
 using System.Security;
 using System.Threading;
 #endif
-
 #if SSHARP
 using Crestron.SimplSharp;
+
 namespace SSCore.Diagnostics
 #else
 namespace System.Diagnostics
 #endif
 	{
-   public static partial class Trace
+	public static partial class Trace
 		{
 #if SSHARP
-	   public static OutputMode Mode { get; set; }
+		public static OutputMode Mode { get; set; }
 
-	   static Trace ()
-		   {
+		static Trace ()
+			{
 			Mode = OutputMode.Debugger;
-		   }
+			}
 
-	   public delegate string FormatMessageDelegate (string message);
+		public delegate string FormatMessageDelegate (string message);
 
-	   private static FormatMessageDelegate formatMessage;
-	   public static FormatMessageDelegate FormatMessage
-		   {
-		   get { return formatMessage ?? (s => s); }
-		   set { formatMessage = value; }
-		   }
+		private static FormatMessageDelegate formatMessage;
+
+		public static FormatMessageDelegate FormatMessage
+			{
+			get { return formatMessage ?? (s => s); }
+			set { formatMessage = value; }
+			}
 #endif
 
-	   internal static readonly IDebugLogger s_logger = new WindowsDebugLogger ();
+		internal static readonly IDebugLogger s_logger = new WindowsDebugLogger ();
 
 		internal sealed class WindowsDebugLogger : IDebugLogger
 			{
+#if SSHARP
+			private static readonly CType _ctypeThread;
+			private static readonly PropertyInfo _propCurrentThread;
+			private static readonly PropertyInfo _propName;
+			private delegate object DelGetCurrentThread ();
+			private static DelGetCurrentThread _delGetCurrentThread;
+
+			static WindowsDebugLogger ()
+				{
+				try
+					{
+					_ctypeThread = Type.GetType ("Crestron.SimplSharpPro.CrestronThread.Thread, SimplSharpPro");
+					}
+				catch
+					{
+					}
+
+				if (_ctypeThread == null)
+					return;
+
+				_propCurrentThread = _ctypeThread.GetProperty ("CurrentThread");
+				_propName = _ctypeThread.GetProperty ("Name");
+				}
+
+			private static bool IsCommandThread
+				{
+				get
+					{
+					if (_ctypeThread == null)
+						return false;
+
+					if (_delGetCurrentThread == null)
+						_delGetCurrentThread = (DelGetCurrentThread)CDelegate.CreateDelegate (typeof (DelGetCurrentThread), null, _propCurrentThread.GetGetMethod ());
+
+					return (string)_propName.GetValue (_delGetCurrentThread (), null) == "SimplSharpProCommandProcessorThread";
+					}
+				}
+#endif
+
 #if !NETCF
          [SecuritySafeCritical]
 #endif
+
 			public void ShowAssertDialog (string stackTrace, string message, string detailMessage)
 				{
 				string fullMessage = message + Environment.NewLine + detailMessage + Environment.NewLine + stackTrace;
@@ -96,6 +138,7 @@ namespace System.Diagnostics
 #if !NETCF
          [System.Security.SecuritySafeCritical]
 #endif
+
 			private static void WriteToDebugger (string message)
 				{
 #if !SSHARP
@@ -110,8 +153,11 @@ namespace System.Diagnostics
 					var msg = FormatMessage (message ?? string.Empty);
 
 					if (Mode == OutputMode.Console || (Mode == OutputMode.ConsoleIfNotDebugging && !Debugger.IsAttached))
-						CrestronConsole.Print (msg);
-					else 
+						if (IsCommandThread)
+							CrestronConsole.ConsoleCommandResponse (msg);
+						else
+							CrestronConsole.Print (msg);
+					else
 						Debugger.Write (msg);
 #else
                Interop.mincore.OutputDebugString(message ?? string.Empty);
