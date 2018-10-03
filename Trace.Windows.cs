@@ -27,13 +27,13 @@ namespace System.Diagnostics
 			Mode = OutputMode.Debugger;
 			}
 
-		public delegate string FormatMessageDelegate (string message);
+		public delegate string FormatMessageDelegate (string message, bool chunked);
 
 		private static FormatMessageDelegate formatMessage;
 
 		public static FormatMessageDelegate FormatMessage
 			{
-			get { return formatMessage ?? (s => s); }
+			get { return formatMessage ?? ((s, b) => s); }
 			set { formatMessage = value; }
 			}
 #endif
@@ -128,9 +128,9 @@ namespace System.Diagnostics
 						int offset;
 						for (offset = 0; offset < message.Length - WriteChunkLength; offset += WriteChunkLength)
 							{
-							WriteToDebugger (message.Substring (offset, WriteChunkLength));
+							WriteToDebugger (message.Substring (offset, WriteChunkLength), offset != 0);
 							}
-						WriteToDebugger (message.Substring (offset));
+						WriteToDebugger (message.Substring (offset), offset != 0);
 						}
 					}
 				}
@@ -141,6 +141,11 @@ namespace System.Diagnostics
 
 			private static void WriteToDebugger (string message)
 				{
+				WriteToDebugger (message, false);
+				}
+
+			private static void WriteToDebugger (string message, bool chunk)
+				{
 #if !SSHARP
                 if (Debugger.IsLogging())
                 {
@@ -150,7 +155,7 @@ namespace System.Diagnostics
 #endif
 					{
 #if SSHARP
-					var msg = FormatMessage (message ?? string.Empty);
+					var msg = FormatMessage (message ?? string.Empty, chunk);
 
 					if (Mode == OutputMode.Console || (Mode == OutputMode.ConsoleIfNotDebugging && !Debugger.IsAttached))
 						if (IsCommandThread)
