@@ -4,10 +4,10 @@
 #define DEBUG // Do not remove this, it is needed to retain calls to these conditional methods in release builds
 
 using System;
-using Crestron.SimplSharp;
 #if SSHARP
 using System.Linq;
 using Environment = Crestron.SimplSharp.CrestronEnvironment;
+using Crestron.SimplSharp;
 #else
 #endif
 
