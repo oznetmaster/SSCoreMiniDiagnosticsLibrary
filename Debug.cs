@@ -4,6 +4,7 @@
 #define DEBUG // Do not remove this, it is needed to retain calls to these conditional methods in release builds
 
 using System;
+using Crestron.SimplSharp;
 #if SSHARP
 using System.Linq;
 using Environment = Crestron.SimplSharp.CrestronEnvironment;
@@ -278,5 +279,18 @@ namespace System.Diagnostics
 			WriteLine (format, args);
 			}
 
+#if SSHARP
+		[System.Diagnostics.Conditional ("DEBUG")]
+		public static void Log (string message)
+			{
+			ErrorLog.Info (message);
+			}
+
+		[System.Diagnostics.Conditional ("DEBUG")]
+		public static void Log (string format, params object[] args)
+			{
+			ErrorLog.Info (format, args);
+			}
+#endif
 		}
 	}

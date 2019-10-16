@@ -7,6 +7,7 @@ using System;
 #if SSHARP
 using System.Linq;
 using Environment = Crestron.SimplSharp.CrestronEnvironment;
+using Crestron.SimplSharp;
 #else
 #endif
 
@@ -268,5 +269,19 @@ namespace System.Diagnostics
 			{
 			WriteLine (format, args);
 			}
+
+#if SSHARP
+		[System.Diagnostics.Conditional ("TRACE")]
+		public static void Log (string message)
+			{
+			ErrorLog.Info (message);
+			}
+
+		[System.Diagnostics.Conditional ("TRACE")]
+		public static void Log (string format, params object[] args)
+			{
+			ErrorLog.Info (format, args);
+			}
+#endif
 		}
 	}
